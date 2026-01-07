@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>猎鹰SEO-监控结果分析</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f2f3f5;
+      color: #333;
+      font-size: 14px;
+    }
+
+    h3 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    /* 筛选卡片 */
+    .filter-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
+      padding: 16px 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .filter-item {
+      min-width: 290px;
+      margin-right: 15px;
+    }
+
+    .filter-item>label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #555;
+    }
+
+    /* 通用输入容器 */
+    .input-group {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    /* 关键词/URL 输入框样式优化 */
+    .search-input {
+      flex: 1;
+      height: 36px;
+      padding: 0 12px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .search-input::placeholder {
+      color: #999;
+    }
+
+    /* 关键词/URL 下拉选择器样式 */
+    .search-select {
+      min-width: 100px;
+      height: 36px;
+      padding: 0 12px;
+      border: none;
+      border-left: 1px solid #e0e0e0;
+      background: #f8f9fa;
+      outline: none;
+      font-size: 14px;
+      cursor: pointer;
+      color: #333;
+    }
+
+    /* 折叠下拉通用样式 */
+    .drop {
+      position: relative;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    .drop-input {
+      height: 36px;
+      width: 100%;
+      padding: 0 32px 0 12px;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .drop::after {
+      content: "▼";
+      font-size: 12px;
+      color: #999;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .drop-panel {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      width: 100%;
+      max-height: 280px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+      z-index: 999;
+    }
+
+    .drop-panel.show {
+      display: block;
+    }
+
+    /* 单选选项 */
+    .drop-panel .radio {
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .drop-panel .radio:hover {
+      background: #f5f7fa;
+    }
+
+    .drop-panel .radio.active {
+      background: #4a90e2;
+      color: #fff;
+    }
+
+    /* 多选选项 */
+    .drop-panel .check {
+      display: flex;
+      align-items: center;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .drop-panel .check:hover {
+      background: #f5f7fa;
+    }
+
+    .drop-panel .check input {
+      margin-right: 8px;
+    }
+
+    /* 区间/定制范围样式 */
+    .drop-panel .section {
+      border-top: 1px solid #f0f0f0;
+      padding: 8px 0;
+      margin-top: 8px;
+    }
+
+    .drop-panel .section-title {
+      padding: 4px 12px;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .drop-panel .custom {
+      display: flex;
+      gap: 10px;
+      padding: 6px 12px;
+      flex-wrap: wrap;
+      flex-direction: column;
+    }
+
+    .drop-panel .custom input {
+      flex: 1;
+      height: 28px;
+      padding: 0 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 13px;
+      min-width: 80px;
+    }
+
+    .drop-panel .custom button {
+      padding: 4px 10px;
+      font-size: 13px;
+      border: none;
+      border-radius: 4px;
+      background: #4a90e2;
+      color: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* 已选标签 */
+    .tag-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      font-size: 13px;
+      background: #e6f7ff;
+      border-radius: 4px;
+      color: #1890ff;
+    }
+
+    .tag i {
+      margin-left: 6px;
+      cursor: pointer;
+      color: #999;
+      font-style: normal;
+    }
+
+    .tag i:hover {
+      color: #ff4d4f;
+    }
+
+    /* 搜索过滤样式 */
+    .search-filter {
+      padding: 8px 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .search-filter input {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    .search-filter input:focus {
+      outline: none;
+      border-color: #4a90e2;
+    }
+
+    /* 表格样式 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
+    }
+
+    th,
+    td {
+      padding: 12px 15px;
+      font-size: 14px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    th {
+      background: #fafbfc;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      padding-right: 30px;
+      color: #262626;
+    }
+
+    th:hover {
+      background: #f0f2f5;
+    }
+
+    /* 排序图标样式优化 */
+    .sort-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #ccc;
+    }
+
+    .sort-icon::before {
+      content: "↑";
+      font-size: 8px;
+      line-height: 8px;
+    }
+
+    .sort-icon::after {
+      content: "↓";
+      font-size: 8px;
+      line-height: 8px;
+    }
+
+    .sort-icon.asc::before {
+      color: #4a90e2;
+      font-weight: bold;
+    }
+
+    .sort-icon.desc::after {
+      color: #4a90e2;
+      font-weight: bold;
+    }
+
+    tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    tbody tr.selected {
+      background: #e6f7ff;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 24px;
+      color: #999;
+    }
+
+    a {
+      color: #4a90e2;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* 操作按钮区域 */
+    .table-actions {
+      margin-top: 10px;
+      text-align: right;
+    }
+
+    .import-btn {
+      padding: 6px 16px;
+      background: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      display: none;
+    }
+
+    .import-btn.show {
+      display: inline-block;
+    }
+
+    .import-btn:hover {
+      background: #3a80d2;
+    }
+
+    /* 弹框样式 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      display: none;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 8px;
+      width: 700px;
+      max-width: 95%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #999;
+    }
+
+    .modal-body {
+      padding: 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid #eee;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .modal-footer button {
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .modal-footer .cancel-btn {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      margin-right: 8px;
+    }
+
+    .modal-footer .confirm-btn {
+      background: #4a90e2;
+      color: white;
+      border: none;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .form-control {
+      width: 100%;
+      height: 36px;
+      padding: 0 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    /* 关键词表单项样式 - 核心新增 */
+    .keyword-form-item {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      background: #fafbfc;
+    }
+
+    .keyword-form-item .item-title {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed #f0f0f0;
+    }
+
+    /* form-group容器：专门承载多组配置 */
+    .form-group-container {
+      gap: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .keyword-form-item .form-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .keyword-form-item .form-col {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    /* 复选下拉框样式优化（负责人专用） */
+    .multi-select {
+      width: 100%;
+      height: auto;
+      min-height: 36px;
+      padding: 6px 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+      /* 支持多选滚动 */
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    /* 重复添加按钮样式 */
+    .add-keyword-item {
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
+      margin: 0 auto;
+      background: #f5f7fa;
+      border: 1px dashed #d9d9d9;
+      border-radius: 6px;
+      color: #4a90e2;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .add-keyword-item:hover {
+      background: #e6f7ff;
+      border-color: #1890ff;
+    }
+
+    /* 移除关键词表单项按钮 */
+    .remove-keyword-item {
+      float: right;
+      background: none;
+      border: none;
+      color: #ff4d4f;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+
+    .remove-keyword-item:hover {
+      background: #fff2f0;
+      border-radius: 4px;
+    }
+
+    /* 移除单个form-group按钮 */
+    .remove-form-group {
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    .remove-form-group button {
+      background: none;
+      border: none;
+      color: #ff4d4f;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+
+    .remove-form-group button:hover {
+      background: #fff2f0;
+      border-radius: 4px;
+    }
+
+    textarea.form-control {
+      height: auto;
+      min-height: 60px;
+      padding: 12px;
+      resize: vertical;
+    }
+
+    /* 负责人复选下拉专用样式（仿意图筛选） */
+    .leader-drop {
+      position: relative;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background: #fff;
+      width: 100%;
+    }
+
+    .leader-drop-input {
+      height: 36px;
+      width: 100%;
+      padding: 0 32px 0 12px;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .leader-drop::after {
+      content: "▼";
+      font-size: 12px;
+      color: #999;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .leader-drop-panel {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      width: 100%;
+      max-height: 180px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+      z-index: 999;
+    }
+
+    .leader-drop-panel.show {
+      display: block;
+    }
+
+    .leader-drop-panel .check {
+      display: flex;
+      align-items: center;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .leader-drop-panel .check:hover {
+      background: #f5f7fa;
+    }
+
+    .leader-drop-panel .check input {
+      margin-right: 8px;
+    }
+
+    /* 负责人已选标签样式 */
+    .leader-tag-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <div class="filter-card">
+    <!-- 关键词 -->
+    <div class="filter-item">
+      <label>关键词</label>
+      <div class="input-group">
+        <input class="search-input" id="kw-text-input" placeholder="输入关键词" autocomplete="off">
+        <select class="search-select" id="kw-mode-select">
+          <option value="包含">包含</option>
+          <option value="精确匹配">精确匹配</option>
+          <option value="开头是">开头是</option>
+          <option value="结尾是">结尾是</option>
+        </select>
+      </div>
+      <div class="tag-group" id="kw-tags"></div>
+    </div>
+
+    <!-- URL -->
+    <div class="filter-item">
+      <label>URL</label>
+      <div class="input-group">
+        <input class="search-input" id="url-text-input" placeholder="输入URL" autocomplete="off">
+        <select class="search-select" id="url-mode-select">
+          <option value="包含">包含</option>
+          <option value="精确匹配">精确匹配</option>
+        </select>
+      </div>
+      <div class="tag-group" id="url-tags"></div>
+    </div>
+
+    <!-- 搜索量 -->
+    <div class="filter-item">
+      <label>搜索量</label>
+      <div class="drop" id="vol-drop">
+        <input class="drop-input" placeholder="选择或输入范围">
+        <div class="drop-panel">
+          <div class="radio">100,001+</div>
+          <div class="radio">10,001-100,000</div>
+          <div class="radio">1,001-10,000</div>
+          <div class="radio">101-1,000</div>
+          <div class="radio">11-100</div>
+          <div class="radio">1-10</div>
+          <div class="section">
+            <div class="section-title">定制范围</div>
+            <div class="custom">
+              <input type="number" placeholder="最小值" id="vol-drop-from">
+              <input type="number" placeholder="最大值" id="vol-drop-to">
+              <button id="vol-drop-btn">应用</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tag-group" id="vol-tags"></div>
+    </div>
+
+    <!-- KD -->
+    <div class="filter-item">
+      <label>KD</label>
+      <div class="drop" id="kd-drop">
+        <input type="text" class="drop-input" placeholder="选择或输入范围">
+        <div class="drop-panel">
+          <div class="radio">非常艰难 85-100%</div>
+          <div class="radio">艰难 70-84%</div>
+          <div class="radio">困难 50-69%</div>
+          <div class="radio">一般 30-49%</div>
+          <div class="radio">容易 15-29%</div>
+          <div class="radio">非常容易 0-14%</div>
+          <div class="section">
+            <div class="section-title">定制范围</div>
+            <div class="custom">
+              <input type="number" placeholder="最小值" id="kd-drop-from">
+              <input type="number" placeholder="最大值" id="kd-drop-to">
+              <button id="kd-drop-btn">应用</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tag-group" id="kd-tags"></div>
+    </div>
+
+    <!-- 意图 -->
+    <div class="filter-item">
+      <label>意图</label>
+      <div class="drop" id="intent-drop">
+        <input class="drop-input" placeholder="选择意图（可多选）">
+        <div class="drop-panel">
+          <label class="check"><input type="checkbox" value="资讯"> 资讯</label>
+          <label class="check"><input type="checkbox" value="对比"> 对比</label>
+          <label class="check"><input type="checkbox" value="购买"> 购买</label>
+          <label class="check"><input type="checkbox" value="导航"> 导航</label>
+        </div>
+      </div>
+      <div class="tag-group" id="intent-tags"></div>
+    </div>
+
+    <!-- 域名 -->
+    <div class="filter-item">
+      <label>域名</label>
+      <div class="drop" id="domain-drop">
+        <input class="drop-input" placeholder="输入或选择域名">
+        <div class="drop-panel">
+          <label class="check"><input type="checkbox" value="jd.com"> jd.com</label>
+          <label class="check"><input type="checkbox" value="nike.com"> nike.com</label>
+          <label class="check"><input type="checkbox" value="zhihu.com"> zhihu.com</label>
+        </div>
+      </div>
+      <div class="tag-group" id="domain-tags"></div>
+    </div>
+
+    <!-- 国家 -->
+    <div class="filter-item">
+      <label>国家</label>
+      <div class="drop" id="country-drop">
+        <input class="drop-input" placeholder="输入或选择国家">
+        <div class="drop-panel">
+          <label class="check"><input type="checkbox" value="CN"> CN</label>
+          <label class="check"><input type="checkbox" value="US"> US</label>
+        </div>
+      </div>
+      <div class="tag-group" id="country-tags"></div>
+    </div>
+
+    <!-- 流量 -->
+    <div class="filter-item">
+      <label>流量</label>
+      <div class="drop" id="traffic-drop">
+        <input class="drop-input" placeholder="选择或输入范围">
+        <div class="drop-panel">
+          <div class="radio">10,001+</div>
+          <div class="radio">5,001-10,000</div>
+          <div class="radio">1,001-5,000</div>
+          <div class="radio">101-1,000</div>
+          <div class="radio">1-100</div>
+          <div class="section">
+            <div class="section-title">定制范围</div>
+            <div class="custom">
+              <input type="number" placeholder="最小值" id="traffic-drop-from">
+              <input type="number" placeholder="最大值" id="traffic-drop-to">
+              <button id="traffic-drop-btn">应用</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tag-group" id="traffic-tags"></div>
+    </div>
+
+    <!-- 排名 -->
+    <div class="filter-item">
+      <label>排名</label>
+      <div class="drop" id="rank-drop">
+        <input class="drop-input" placeholder="选择或输入范围">
+        <div class="drop-panel">
+          <div class="radio">1-10</div>
+          <div class="radio">11-30</div>
+          <div class="radio">31-50</div>
+          <div class="radio">51-100</div>
+          <div class="radio">100+</div>
+          <div class="section">
+            <div class="section-title">定制范围</div>
+            <div class="custom">
+              <input type="number" placeholder="最小值" id="rank-drop-from">
+              <input type="number" placeholder="最大值" id="rank-drop-to">
+              <button id="rank-drop-btn">应用</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tag-group" id="rank-tags"></div>
+    </div>
+
+    <!-- 数据源 -->
+    <div class="filter-item">
+      <label>数据源</label>
+      <div class="drop" id="ds-drop">
+        <input class="drop-input" placeholder="输入或选择数据源">
+        <div class="drop-panel">
+          <label class="check"><input type="checkbox" value="Google"> Google</label>
+          <label class="check"><input type="checkbox" value="Bing"> Bing</label>
+          <label class="check"><input type="checkbox" value="百度"> 百度</label>
+          <label class="check"><input type="checkbox" value="搜狗"> 搜狗</label>
+        </div>
+      </div>
+      <div class="tag-group" id="ds-tags"></div>
+    </div>
+  </div>
+
+  <!-- 表格操作按钮 -->
+  <div class="table-actions">
+    <button class="import-btn" id="importToOperation">导入至运营</button>
+  </div>
+
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="selectAll"></th>
+        <th data-field="keyword">关键词<span class="sort-icon"></span></th>
+        <th data-field="intent">意图<span class="sort-icon"></span></th>
+        <th data-field="rank">排名<span class="sort-icon"></span></th>
+        <th data-field="country">国家<span class="sort-icon"></span></th>
+        <th data-field="traffic">流量<span class="sort-icon"></span></th>
+        <th data-field="volume">搜索量<span class="sort-icon"></span></th>
+        <th data-field="clicks">点击量<span class="sort-icon"></span></th>
+        <th data-field="url">URL<span class="sort-icon"></span></th>
+        <th data-field="domain">域名<span class="sort-icon"></span></th>
+        <th data-field="source">来源<span class="sort-icon"></span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><input type="checkbox" class="row-select"></td>
+        <td>nike air max</td>
+        <td>购买</td>
+        <td>3</td>
+        <td>US</td>
+        <td>8,500</td>
+        <td>22,000</td>
+        <td>7,200</td>
+        <td><a href="https://nike.com/air-max" target="_blank" rel="noopener">https://nike.com/air-max</a></td>
+        <td>nike.com</td>
+        <td>Google</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" class="row-select"></td>
+        <td>跑鞋推荐</td>
+        <td>资讯,对比</td>
+        <td>1</td>
+        <td>CN</td>
+        <td>12,000</td>
+        <td>30,000</td>
+        <td>11,000</td>
+        <td><a href="https://zhihu.com/xxx" target="_blank" rel="noopener">https://zhihu.com/xxx</a></td>
+        <td>zhihu.com</td>
+        <td>百度</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" class="row-select"></td>
+        <td>篮球鞋</td>
+        <td>购买</td>
+        <td>8</td>
+        <td>CN</td>
+        <td>5,500</td>
+        <td>18,000</td>
+        <td>5,000</td>
+        <td><a href="https://jd.com/xxx" target="_blank" rel="noopener">https://jd.com/xxx</a></td>
+        <td>jd.com</td>
+        <td>百度</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 导入至运营弹框 - 优化后的核心弹窗 -->
+  <div class="modal-overlay" id="importModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h4 class="modal-title">导入至运营</h4>
+        <button class="modal-close" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- 关键词表单容器 -->
+        <div id="keywordFormContainer">
+          <!-- 表单项将通过JS动态生成 -->
+        </div>
+        <!-- 全局新增按钮（新增关键词配置项，保留原有功能） -->
+
+      </div>
+      <div class="modal-footer">
+        <button class="cancel-btn" id="cancelImport">取消</button>
+        <button class="confirm-btn" id="confirmImport">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ===== 1. 基础数据与状态管理 ===== */
+    // 模拟数据源
+    const rawData = [
+      { keyword: "nike air max", domain: "nike.com", source: "Google", intent: ["购买"], rank: 3, country: "US", traffic: 8500, volume: 22000, clicks: 7200, url: "https://nike.com/air-max" },
+      { keyword: "跑鞋推荐", domain: "zhihu.com", source: "百度", intent: ["资讯", "对比"], rank: 1, country: "CN", traffic: 12000, volume: 30000, clicks: 11000, url: "https://zhihu.com/xxx" },
+      { keyword: "篮球鞋", domain: "jd.com", source: "百度", intent: ["购买"], rank: 8, country: "CN", traffic: 5500, volume: 18000, clicks: 5000, url: "https://jd.com/xxx" },
+    ];
+
+    // 排序状态
+    let sortState = {
+      field: null,
+      direction: 'asc'
+    };
+
+    // 筛选条件（精简版）
+    const filterState = {
+      keyword: { text: '', mode: '包含' },
+      url: { text: '', mode: '包含' },
+      volume: new Set(),
+      kd: new Set(),
+      traffic: new Set(),
+      rank: new Set(),
+      intent: new Set(),
+      domain: new Set(),
+      country: new Set(),
+      ds: new Set()
+    };
+
+    // 选中的行ID集合
+    const selectedRows = new Set();
+
+    /* ===== 2. 标签渲染通用方法 ===== */
+    function renderTags(dataSet, tagsId) {
+      const container = document.getElementById(tagsId);
+      container.innerHTML = [...dataSet].map(value =>
+        `<span class="tag">${value}<i data-val="${value}">×</i></span>`
+      ).join("");
+
+      // 标签删除事件
+      container.querySelectorAll("i").forEach(icon => {
+        icon.onclick = (e) => {
+          dataSet.delete(e.target.dataset.val);
+          renderTags(dataSet, tagsId);
+          applyFilter();
+        };
+      });
+    }
+
+    // 关键词/URL标签渲染（带搜索规则）
+    function renderSearchTags() {
+      // 关键词标签
+      const kwTags = document.getElementById('kw-tags');
+      kwTags.innerHTML = filterState.keyword.text
+        ? `<span class="tag">关键词：${filterState.keyword.mode} "${filterState.keyword.text}"<i>×</i></span>`
+        : '';
+
+      // URL标签
+      const urlTags = document.getElementById('url-tags');
+      urlTags.innerHTML = filterState.url.text
+        ? `<span class="tag">URL：${filterState.url.mode} "${filterState.url.text}"<i>×</i></span>`
+        : '';
+
+      // 删除标签事件
+      if (kwTags.querySelector('i')) {
+        kwTags.querySelector('i').onclick = () => {
+          filterState.keyword.text = '';
+          document.getElementById('kw-text-input').value = '';
+          renderSearchTags();
+          applyFilter();
+        };
+      }
+
+      if (urlTags.querySelector('i')) {
+        urlTags.querySelector('i').onclick = () => {
+          filterState.url.text = '';
+          document.getElementById('url-text-input').value = '';
+          renderSearchTags();
+          applyFilter();
+        };
+      }
+    }
+
+    /* ===== 3. 下拉框配置（极简版）===== */
+    const dropConfig = {
+      "vol-drop": { type: "range", set: filterState.volume, tags: "vol-tags" },
+      "kd-drop": { type: "range", set: filterState.kd, tags: "kd-tags" },
+      "traffic-drop": { type: "range", set: filterState.traffic, tags: "traffic-tags" },
+      "rank-drop": { type: "range", set: filterState.rank, tags: "rank-tags" },
+      "intent-drop": { type: "check", set: filterState.intent, tags: "intent-tags" },
+      "domain-drop": { type: "check", set: filterState.domain, tags: "domain-tags", searchable: true },
+      "country-drop": { type: "check", set: filterState.country, tags: "country-tags", searchable: true },
+      "ds-drop": { type: "check", set: filterState.ds, tags: "ds-tags", searchable: true }
+    };
+
+    // 范围选项配置（独立管理，减少冗余）
+    const rangeOptions = {
+      "vol-drop": ["100,001+", "10,001-100,000", "1,001-10,000", "101-1,000", "11-100", "1-10"],
+      "kd-drop": ["非常艰难 85-100%", "艰难 70-84%", "困难 50-69%", "一般 30-49%", "容易 15-29%", "非常容易 0-14%"],
+      "traffic-drop": ["10,001+", "5,001-10,000", "1,001-5,000", "101-1,000", "1-100"],
+      "rank-drop": ["1-10", "11-30", "31-50", "51-100", "100+"]
+    };
+
+    /* ===== 4. 初始化下拉框 ===== */
+    Object.keys(dropConfig).forEach(dropId => {
+      const config = dropConfig[dropId];
+      const panel = document.querySelector(`#${dropId} .drop-panel`);
+      const input = document.querySelector(`#${dropId} .drop-input`);
+
+
+      // 可搜索下拉框初始化
+      if (config.searchable) {
+        const searchInput = document.getElementById(`${dropId.split('-')[0]}-search`);
+        searchInput?.addEventListener('input', (e) => {
+          const keyword = e.target.value.toLowerCase();
+          panel.querySelectorAll('.check').forEach(item => {
+            item.style.display = item.textContent.toLowerCase().includes(keyword) ? '' : 'none';
+          });
+        });
+      }
+
+      // 下拉框显示/隐藏
+      input.addEventListener('focus', () => {
+        panel.classList.add("show");
+        // 清空搜索框并重置选项显示
+        if (config.searchable) {
+          const searchInput = document.getElementById(`${dropId.split('-')[0]}-search`);
+          if (searchInput) {
+            searchInput.value = '';
+            panel.querySelectorAll('.check').forEach(item => item.style.display = '');
+          }
+        }
+      });
+
+      // 点击外部关闭下拉框
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest(`#${dropId}`)) {
+          panel.classList.remove("show");
+        }
+      });
+    });
+
+    /* ===== 5. 复选框下拉框事件绑定 ===== */
+    document.querySelectorAll('.drop-panel .check').forEach(checkItem => {
+      const checkbox = checkItem.querySelector('input');
+      const dropId = checkItem.closest('.drop-panel').parentElement.id;
+      const config = dropConfig[dropId];
+
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+          config.set.add(checkbox.value);
+        } else {
+          config.set.delete(checkbox.value);
+        }
+        renderTags(config.set, config.tags);
+        applyFilter();
+      });
+    });
+
+    /* ===== 6. 定制范围按钮事件 ===== */
+    document.querySelectorAll('.drop-panel .custom button').forEach(btn => {
+      const dropId = btn.closest('.drop-panel').parentElement.id;
+      const config = dropConfig[dropId];
+
+      btn.onclick = () => {
+        const fromInput = document.getElementById(`${dropId}-from`);
+        const toInput = document.getElementById(`${dropId}-to`);
+        const from = fromInput.value;
+        const to = toInput.value;
+
+        if (!from && !to) return;
+
+        let rangeText = '';
+        if (from && to) rangeText = `${from}-${to}`;
+        else if (from) rangeText = `${from}+`;
+        else if (to) rangeText = `0-${to}`;
+
+        config.set.clear();
+        config.set.add(`自定义范围：${rangeText}`);
+        renderTags(config.set, config.tags);
+        btn.closest('.drop-panel').classList.remove('show');
+        applyFilter();
+
+        // 清空输入框
+        fromInput.value = '';
+        toInput.value = '';
+      };
+    });
+
+    /* ===== 7. 关键词/URL搜索逻辑 ===== */
+    // 关键词输入和模式选择
+    document.getElementById('kw-text-input').addEventListener('input', (e) => {
+      filterState.keyword.text = e.target.value.trim();
+      renderSearchTags();
+    });
+
+    document.getElementById('kw-mode-select').addEventListener('change', (e) => {
+      filterState.keyword.mode = e.target.value;
+      renderSearchTags();
+    });
+
+    document.getElementById('kw-text-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && filterState.keyword.text) applyFilter();
+    });
+
+    // URL输入和模式选择
+    document.getElementById('url-text-input').addEventListener('input', (e) => {
+      filterState.url.text = e.target.value.trim();
+      renderSearchTags();
+    });
+
+    document.getElementById('url-mode-select').addEventListener('change', (e) => {
+      filterState.url.mode = e.target.value;
+      renderSearchTags();
+    });
+
+    document.getElementById('url-text-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && filterState.url.text) applyFilter();
+    });
+
+    /* ===== 8. 表格排序功能 ===== */
+    function sortData(data, field, direction) {
+      return [...data].sort((a, b) => {
+        let valA = a[field];
+        let valB = b[field];
+
+        // 处理数组类型（意图字段）
+        if (Array.isArray(valA)) valA = valA.join(',').toLowerCase();
+        if (Array.isArray(valB)) valB = valB.join(',').toLowerCase();
+
+        // 统一字符串转小写，数字保持原样
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+
+        // 比较逻辑
+        if (valA < valB) return direction === 'asc' ? -1 : 1;
+        if (valA > valB) return direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    // 绑定表头排序事件
+    document.querySelectorAll('#dataTable th').forEach(th => {
+      th.addEventListener('click', function () {
+        // 跳过全选复选框所在的表头
+        if (this.querySelector('input[type="checkbox"]')) return;
+
+        const field = this.dataset.field;
+
+        // 更新排序状态
+        if (sortState.field === field) {
+          sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+          sortState.field = field;
+          sortState.direction = 'asc';
+        }
+
+        // 更新排序图标
+        document.querySelectorAll('.sort-icon').forEach(icon => {
+          icon.className = 'sort-icon';
+        });
+
+        const currentIcon = this.querySelector('.sort-icon');
+        currentIcon.className = `sort-icon ${sortState.direction}`;
+
+        // 应用筛选和排序
+        applyFilter();
+      });
+    });
+
+    /* ===== 9. 表格选择功能 ===== */
+    // 全选功能
+    document.getElementById('selectAll').addEventListener('change', function () {
+      const isChecked = this.checked;
+      const checkboxes = document.querySelectorAll('.row-select');
+
+      checkboxes.forEach((checkbox, index) => {
+        checkbox.checked = isChecked;
+        const keyword = rawData[index].keyword; // 使用关键词作为唯一标识
+        if (isChecked) {
+          selectedRows.add(keyword);
+          checkbox.closest('tr').classList.add('selected');
+        } else {
+          selectedRows.delete(keyword);
+          checkbox.closest('tr').classList.remove('selected');
+        }
+      });
+
+      updateImportButton();
+    });
+
+    // 行选择功能
+    function bindRowSelectEvents() {
+      document.querySelectorAll('.row-select').forEach((checkbox, index) => {
+        checkbox.addEventListener('change', function () {
+          const row = this.closest('tr');
+          const keyword = row.querySelector('td:nth-child(2)').textContent; // 获取关键词作为标识
+
+          if (this.checked) {
+            selectedRows.add(keyword);
+            row.classList.add('selected');
+          } else {
+            selectedRows.delete(keyword);
+            row.classList.remove('selected');
+            document.getElementById('selectAll').checked = false; // 取消全选
+          }
+
+          updateImportButton();
+        });
+
+        // 点击行选中复选框
+        checkbox.closest('tr').addEventListener('click', function (e) {
+          if (e.target !== checkbox) {
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change'));
+          }
+        });
+      });
+    }
+
+    // 更新导入按钮显示状态
+    function updateImportButton() {
+      const importBtn = document.getElementById('importToOperation');
+      if (selectedRows.size > 0) {
+        importBtn.classList.add('show');
+      } else {
+        importBtn.classList.remove('show');
+      }
+    }
+
+    /* ===== 10. 核心修改：单个关键词内新增多组form-group ===== */
+    // 生成单个form-group（负责人+编写类型+备注）
+    function createSingleFormGroup() {
+      const formGroup = document.createElement('div');
+      formGroup.className = 'form-group';
+      // 唯一标识，方便移除
+      formGroup.dataset.id = Date.now();
+
+      formGroup.innerHTML = `
+    <div class="form-row">
+      <div class="form-col">
+        <label>负责人（可多选）</label>
+        <!-- 仿意图筛选的复选下拉框 -->
+        <div class="leader-drop" data-id="${Date.now()}">
+          <input class="leader-drop-input" placeholder="选择负责人（可多选）" readonly>
+          <div class="leader-drop-panel">
+            <label class="check"><input type="checkbox" value="张三"> 张三</label>
+            <label class="check"><input type="checkbox" value="李四"> 李四</label>
+            <label class="check"><input type="checkbox" value="王五"> 王五</label>
+            <label class="check"><input type="checkbox" value="赵六"> 赵六</label>
+          </div>
+        </div>
+        <!-- 负责人已选标签容器 -->
+        <div class="leader-tag-group"></div>
+      </div>
+      <div class="form-col">
+        <label>编写类型</label>
+        <select class="form-control" name="writeType">
+          <option value="原创">原创</option>
+          <option value="改写" selected>改写</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-col" style="flex: 100%;">
+        <label>备注</label>
+        <textarea class="form-control" name="remark" placeholder="请输入备注（可选）"></textarea>
+      </div>
+    </div>
+    <div class="remove-form-group">
+      <button type="button">移除该配置组</button>
+    </div>
+  `;
+
+      // 初始化当前form-group的负责人下拉框
+      initLeaderDrop(formGroup);
+
+      // 绑定移除当前form-group的事件
+      const removeBtn = formGroup.querySelector('.remove-form-group button');
+      removeBtn.addEventListener('click', function () {
+        formGroup.remove();
+      });
+
+      return formGroup;
+    }
+
+    // 生成单个关键词配置项（内含form-group容器，可新增多组form-group）
+    function createKeywordFormItem(keyword) {
+      const formItem = document.createElement('div');
+      formItem.className = 'keyword-form-item';
+      formItem.dataset.keyword = keyword || '自定义关键词';
+
+      // 核心：新增form-group容器，专门承载多组配置
+      formItem.innerHTML = `
+    <div class="item-title">
+      关键词配置：<strong>${keyword || '自定义关键词'}</strong>
+      <button class="remove-keyword-item">移除关键词配置</button>
+    </div>
+    <!-- form-group容器：存放多组配置 -->
+    <div class="form-group-container"></div>
+    <!-- 内部新增按钮：新增form-group（不是关键词配置项） -->
+    <div style="text-align:center;">
+      <div class="add-keyword-item inner-add-form-group">+</div>
+    </div>
+  `;
+
+      // 获取form-group容器
+      const formGroupContainer = formItem.querySelector('.form-group-container');
+      // 默认添加1组form-group
+      formGroupContainer.appendChild(createSingleFormGroup());
+
+      // 绑定移除关键词配置项的事件
+      const removeKeywordBtn = formItem.querySelector('.remove-keyword-item');
+      removeKeywordBtn.addEventListener('click', function () {
+        formItem.remove();
+      });
+
+      // 绑定内部新增按钮事件：新增form-group到当前关键词配置内
+      const innerAddBtn = formItem.querySelector('.inner-add-form-group');
+      innerAddBtn.addEventListener('click', function () {
+        const newFormGroup = createSingleFormGroup();
+        formGroupContainer.appendChild(newFormGroup);
+      });
+
+      return formItem;
+    }
+
+    // 初始化负责人复选下拉（仿意图筛选效果：显示隐藏+勾选+标签渲染）
+    function initLeaderDrop(formGroup) {
+      const leaderDrop = formGroup.querySelector('.leader-drop');
+      const dropInput = leaderDrop.querySelector('.leader-drop-input');
+      const dropPanel = leaderDrop.querySelector('.leader-drop-panel');
+      const tagGroup = formGroup.querySelector('.leader-tag-group');
+      const checkboxes = dropPanel.querySelectorAll('.check input');
+      // 存储当前form-group已选负责人的Set集合
+      const selectedLeaders = new Set();
+
+      // 1. 下拉框显示/隐藏切换
+      dropInput.addEventListener('focus', () => {
+        // 关闭其他所有负责人下拉框，避免重叠
+        document.querySelectorAll('.leader-drop-panel.show').forEach(panel => {
+          if (panel !== dropPanel) panel.classList.remove('show');
+        });
+        dropPanel.classList.add('show');
+      });
+
+      // 点击外部关闭当前负责人下拉框
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.leader-drop')) {
+          dropPanel.classList.remove('show');
+        }
+      });
+
+      // 2. 复选框勾选事件（同步选中状态+渲染标签）
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          const leaderName = checkbox.value;
+          if (checkbox.checked) {
+            selectedLeaders.add(leaderName);
+          } else {
+            selectedLeaders.delete(leaderName);
+          }
+          renderLeaderTags(selectedLeaders, tagGroup, dropInput);
+        });
+      });
+
+      // 3. 标签删除事件（同步复选框状态）
+      tagGroup.addEventListener('click', (e) => {
+        if (e.target.tagName === 'I') {
+          const leaderName = e.target.dataset.val;
+          selectedLeaders.delete(leaderName);
+          // 取消对应复选框勾选
+          checkboxes.forEach(checkbox => {
+            if (checkbox.value === leaderName) {
+              checkbox.checked = false;
+            }
+          });
+          renderLeaderTags(selectedLeaders, tagGroup, dropInput);
+        }
+      });
+
+      // 初始化标签渲染
+      renderLeaderTags(selectedLeaders, tagGroup, dropInput);
+    }
+
+    // 渲染负责人已选标签（同步下拉输入框显示）
+    function renderLeaderTags(selectedLeaders, tagGroup, dropInput) {
+      const leaderArr = [...selectedLeaders];
+      // 渲染标签
+      tagGroup.innerHTML = leaderArr.map(name =>
+        `<span class="tag">${name}<i data-val="${name}">×</i></span>`
+      ).join('');
+
+      // 同步下拉输入框显示内容
+      if (leaderArr.length > 0) {
+        dropInput.value = leaderArr.join('、');
+      } else {
+        dropInput.value = '';
+        dropInput.placeholder = '选择负责人（可多选）';
+      }
+    }
+
+    function initKeywordForm() {
+      const container = document.getElementById('keywordFormContainer');
+      container.innerHTML = ''; // 清空原有内容
+
+      // 为每个选中的关键词生成表单
+      if (selectedRows.size > 0) {
+        [...selectedRows].forEach(keyword => {
+          const formItem = createKeywordFormItem(keyword);
+          container.appendChild(formItem);
+        });
+      } else {
+        // 无选中关键词时默认生成一个空表单（可手动添加）
+        const formItem = createKeywordFormItem('');
+        container.appendChild(formItem);
+      }
+    }
+
+    // 绑定全局新增关键词表单按钮事件
+
+
+    // 打开弹框时初始化表单
+    document.getElementById('importToOperation').addEventListener('click', function () {
+      initKeywordForm(); // 初始化关键词表单
+      document.getElementById('importModal').classList.add('show');
+    });
+
+    // 关闭弹框
+    function closeModal() {
+      document.getElementById('importModal').classList.remove('show');
+    }
+
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    document.getElementById('cancelImport').addEventListener('click', closeModal);
+
+    // 确认导入：获取所有表单数据（兼容同一关键词多组form-group）
+    document.getElementById('confirmImport').addEventListener('click', function () {
+      const keywordFormItems = document.querySelectorAll('.keyword-form-item');
+      if (keywordFormItems.length === 0) {
+        alert('请至少保留一个关键词配置项');
+        return;
+      }
+
+      // 收集所有表单数据
+      const importData = [];
+      let isValid = true;
+
+      // 遍历每个关键词配置项
+      keywordFormItems.forEach(keywordItem => {
+        const keyword = keywordItem.dataset.keyword || '自定义配置';
+        const formGroups = keywordItem.querySelectorAll('.form-group'); // 获取当前关键词下所有form-group
+
+        if (formGroups.length === 0) {
+          alert(`关键词【${keyword}】请至少保留一组配置`);
+          isValid = false;
+          return;
+        }
+
+        // 遍历当前关键词下的每一组form-group
+        formGroups.forEach(formGroup => {
+          const leaderDrop = formGroup.querySelector('.leader-drop');
+          const selectedLeaders = new Set();
+          // 获取当前form-group已选负责人
+          leaderDrop.querySelectorAll('.check input:checked').forEach(checkbox => {
+            selectedLeaders.add(checkbox.value);
+          });
+          const writeType = formGroup.querySelector('select[name="writeType"]').value;
+          const remark = formGroup.querySelector('textarea[name="remark"]').value;
+
+          // 验证：至少选择一位负责人
+          if (selectedLeaders.size === 0) {
+            alert(`关键词【${keyword}】的某配置组请至少选择一位负责人`);
+            isValid = false;
+            return;
+          }
+
+          // 存入数据（同一关键词对应多条配置）
+          importData.push({
+            keyword: keyword,
+            responsiblePersons: [...selectedLeaders], // 转为数组
+            writeType: writeType,
+            remark: remark.trim()
+          });
+        });
+      });
+
+      if (!isValid) {
+        return;
+      }
+
+      // 打印数据（实际项目中可提交接口）
+      console.log('导入至运营数据：', importData);
+      alert(`成功导入 ${importData.length} 条配置（对应 ${keywordFormItems.length} 个关键词）！`);
+      closeModal();
+    });
+    /* ===== 11. 筛选主函数 ===== */
+    function applyFilter() {
+      // 范围匹配辅助函数
+      const matchRange = (rangeText, value) => {
+        if (!rangeText) return true;
+
+        // 简化的范围匹配逻辑（实际项目中可根据需要完善）
+        if (rangeText.includes('100,001+')) return value >= 100001;
+        if (rangeText.includes('10,001-100,000')) return value >= 10001 && value <= 100000;
+        if (rangeText.includes('1,001-10,000')) return value >= 1001 && value <= 10000;
+        if (rangeText.includes('101-1,000')) return value >= 101 && value <= 1000;
+        if (rangeText.includes('11-100')) return value >= 11 && value <= 100;
+        if (rangeText.includes('1-10')) return value >= 1 && value <= 10;
+        if (rangeText.includes('10,001+')) return value >= 10001;
+        if (rangeText.includes('5,001-10,000')) return value >= 5001 && value <= 10000;
+        if (rangeText.includes('1,001-5,000')) return value >= 1001 && value <= 5000;
+        if (rangeText.includes('101-1,000')) return value >= 101 && value <= 1000;
+        if (rangeText.includes('1-100')) return value >= 1 && value <= 100;
+        if (rangeText.includes('1-10')) return value >= 1 && value <= 10;
+        if (rangeText.includes('11-30')) return value >= 11 && value <= 30;
+        if (rangeText.includes('31-50')) return value >= 31 && value <= 50;
+        if (rangeText.includes('51-100')) return value >= 51 && value <= 100;
+        if (rangeText.includes('100+')) return value >= 101;
+
+        return true;
+      };
+
+      // 核心筛选逻辑
+      let filteredData = rawData.filter(item => {
+        // 关键词筛选
+        if (filterState.keyword.text) {
+          const kw = item.keyword.toLowerCase();
+          const text = filterState.keyword.text.toLowerCase();
+          if (filterState.keyword.mode === '精确匹配' && kw !== text) return false;
+          if (filterState.keyword.mode === '开头是' && !kw.startsWith(text)) return false;
+          if (filterState.keyword.mode === '结尾是' && !kw.endsWith(text)) return false;
+          if (filterState.keyword.mode === '包含' && !kw.includes(text)) return false;
+        }
+
+        // URL筛选
+        if (filterState.url.text) {
+          const url = item.url.toLowerCase();
+          const text = filterState.url.text.toLowerCase();
+          if (filterState.url.mode === '精确匹配' && url !== text) return false;
+          if (filterState.url.mode === '包含' && !url.includes(text)) return false;
+        }
+
+        // 意图筛选
+        if (filterState.intent.size && ![...filterState.intent].some(i => item.intent.includes(i))) return false;
+
+        // 域名筛选
+        if (filterState.domain.size && !filterState.domain.has(item.domain)) return false;
+
+        // 国家筛选
+        if (filterState.country.size && !filterState.country.has(item.country)) return false;
+
+        // 数据源筛选
+        if (filterState.ds.size && !filterState.ds.has(item.source)) return false;
+
+        // 范围筛选
+        const volRule = [...filterState.volume][0] || '';
+        const trafficRule = [...filterState.traffic][0] || '';
+        const rankRule = [...filterState.rank][0] || '';
+
+        if (!matchRange(volRule, item.volume)) return false;
+        if (!matchRange(trafficRule, item.traffic)) return false;
+        if (!matchRange(rankRule, item.rank)) return false;
+
+        return true;
+      });
+
+      // 应用排序
+      if (sortState.field) {
+        filteredData = sortData(filteredData, sortState.field, sortState.direction);
+      }
+
+      // 渲染表格
+      const tbody = document.querySelector('#dataTable tbody');
+      if (filteredData.length === 0) {
+        tbody.innerHTML = '<tr class="no-data"><td colspan="11">暂无匹配数据</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filteredData.map(item => `
+    <tr>
+      <td><input type="checkbox" class="row-select"></td>
+      <td>${item.keyword}</td>
+      <td>${item.intent.join(',')}</td>
+      <td>${item.rank}</td>
+      <td>${item.country}</td>
+      <td>${item.traffic.toLocaleString()}</td>
+      <td>${item.volume.toLocaleString()}</td>
+      <td>${item.clicks.toLocaleString()}</td>
+      <td><a href="${item.url}" target="_blank" rel="noopener">${item.url}</a></td>
+      <td>${item.domain}</td>
+      <td>${item.source}</td>
+    </tr>
+  `).join('');
+
+      // 重新绑定行选择事件
+      bindRowSelectEvents();
+
+      // 恢复选中状态
+      document.querySelectorAll('.row-select').forEach(checkbox => {
+        const keyword = checkbox.closest('tr').querySelector('td:nth-child(2)').textContent;
+        if (selectedRows.has(keyword)) {
+          checkbox.checked = true;
+          checkbox.closest('tr').classList.add('selected');
+        }
+      });
+
+      // 更新全选状态
+      const allCheckboxes = document.querySelectorAll('.row-select');
+      const checkedCheckboxes = document.querySelectorAll('.row-select:checked');
+      document.getElementById('selectAll').checked = allCheckboxes.length > 0 && allCheckboxes.length === checkedCheckboxes.length;
+
+      // 更新导入按钮状态
+      updateImportButton();
+    }
+
+    /* ===== 初始化 ===== */
+    renderSearchTags();
+    applyFilter();
+    bindRowSelectEvents();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DICLOAK - SEO云控台</title>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* 头部样式 */
+        .header {
+            background-color: #2c5282;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* 模块通用样式 */
+        .module {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .module-title {
+            background-color: #3182ce;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .module-content {
+            padding: 20px;
+        }
+
+        /* 筛选区样式 */
+        .filter-area {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 20px;
+            background-color: #f8fafc;
+        }
+
+        .filter-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .filter-fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .filter-item {
+            flex-direction: column;
+            display: flex;
+        }
+
+        .filter-item label {
+            font-size: 12px;
+            color: #4a5568;
+            margin-bottom: 4px;
+        }
+
+        .filter-item input,
+        .filter-item select,
+        .filter-item textarea {
+            padding: 6px 8px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .filter-item input:focus,
+        .filter-item select:focus,
+        .filter-item textarea:focus {
+            border-color: #3182ce;
+        }
+
+        /* 单选框组样式 */
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            padding: 6px 0;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .radio-item input {
+            width: auto;
+        }
+
+        .btn {
+            padding: 6px 10px;
+            /* 缩小按钮内边距，减小按钮宽度 */
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 11px;
+            /* 缩小按钮文字，进一步优化宽度 */
+            transition: background-color 0.2s;
+            white-space: nowrap;
+            /* 按钮文字不换行，保证按钮紧凑 */
+        }
+
+        .btn-primary {
+            background-color: #3182ce;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2b6cb0;
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn-secondary:hover {
+            background-color: #cbd5e0;
+        }
+
+        .btn-danger {
+            background-color: #ec5252;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c53030;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        /* 表格样式 - 优化自动换行 + 列宽分配 */
+        .table-container {
+            overflow-x: scroll;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            /* table-layout: fixed; */
+            /* 固定表格布局，精准控制列宽 */
+        }
+
+        th,
+        td {
+            padding: 10px 6px;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+            /* word-wrap: break-word; */
+            /* 实现长文本自动换行 */
+            word-break: break-all;
+            /* 强制换行，支持中英文混合文本 */
+            white-space: normal;
+            /* 取消默认不换行，允许自动换行 */
+        }
+
+        /* 重新优化列宽分配，解决溢出/过宽/过窄问题 */
+        th:nth-child(1) {
+            width: 25px;
+        }
+
+        /* 复选框列 - 保持不变 */
+        th:nth-child(2) {
+            width: 75px;
+        }
+
+        /* 关键词列 - 收缩，解决过宽问题 */
+        th:nth-child(3) {
+            width: 90px;
+        }
+
+        /* url列 - 适度收缩，不影响展示 */
+        th:nth-child(4) {
+            width: 120px;
+        }
+
+        /* 文章标题列 - 大幅收缩，解决过宽问题 */
+        th:nth-child(5) {
+            width: 65px;
+        }
+
+        /* 编写类型列 - 小幅收缩，适配内容 */
+        th:nth-child(6) {
+            width: 70px;
+        }
+
+        /* 创建类型列 - 小幅收缩，适配内容 */
+        th:nth-child(7) {
+            width: 50px;
+        }
+
+        /* 创建人列 - 保持不变 */
+        th:nth-child(8) {
+            width: 50px;
+        }
+
+        /* 负责人列 - 保持不变 */
+        th:nth-child(9) {
+            width: 80px;
+        }
+
+        /* 创建日期列 - 小幅收缩，适配日期格式 */
+        th:nth-child(10) {
+            width: 80px;
+        }
+
+        /* 撰写日期列 - 小幅收缩，适配日期格式 */
+        th:nth-child(11) {
+            width: 80px;
+        }
+
+        /* 业务分类列 - 小幅收缩，适配内容 */
+        th:nth-child(12) {
+            width: 60px;
+        }
+
+        /* 状态列 - 小幅收缩，适配标签 */
+        th:nth-child(13) {
+            width: 100px;
+        }
+
+        /* 审阅状态列 - 加宽，解决溢出问题 */
+        th:nth-child(14) {
+            width: 120px;
+        }
+
+        /* 备注列 - 大幅加宽，解决过窄问题 */
+        th:nth-child(15) {
+            width: 190px;
+        }
+
+        /* 操作列 - 适度收缩，仍保证按钮单行显示 */
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #2d3748;
+            position: relative;
+            padding: 10px 6px;
+            /* box-sizing: border-box; */
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* 操作列样式 - 强制按钮单行显示，不换行 */
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+            /* 缩小按钮间距，更紧凑 */
+            white-space: nowrap;
+            /* 容器内内容不换行 */
+            overflow: hidden;
+            /* 防止异常溢出（已预留足够宽度，基本不会触发） */
+            justify-content: flex-start;
+            /* 按钮左对齐，保持整洁 */
+        }
+
+        /* 状态标签样式 */
+        .status-tag {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: white;
+            cursor: pointer;
+            display: inline-block;
+            /* 确保标签样式正常 */
+            white-space: nowrap;
+            /* 状态标签文字不换行 */
+        }
+
+        /* 7种业务状态对应的样式 */
+        .status-allocate {
+            background-color: #6b7280;
+            /* 待分配 */
+        }
+
+        .status-approve {
+            background-color: #4299e1;
+            /* 待批准 */
+        }
+
+        .status-rewrite {
+            background-color: #f6ad55;
+            /* 待改写 */
+        }
+
+        .status-review {
+            background-color: #9f7aea;
+            /* 待审阅 */
+        }
+
+        .status-modify {
+            background-color: #fc8181;
+            /* 需修改 */
+        }
+
+        .status-publish {
+            background-color: #68d391;
+            /* 待发布 */
+        }
+
+        .status-completed {
+            background-color: #38b2ac;
+            /* 已完成 */
+        }
+
+        /* 审阅状态标签样式（6种新状态） */
+        .review-keyword-not-start {
+            background-color: #94a3b8;
+            /* 关键词审核未开始 */
+        }
+
+        .review-keyword-reject {
+            background-color: #ef4444;
+            /* 关键词审核不通过 */
+        }
+
+        .review-keyword-complete {
+            background-color: #10b981;
+            /* 关键词审核已完成 */
+        }
+
+        .review-article-not-start {
+            background-color: #64748b;
+            /* 文章审核未开始 */
+        }
+
+        .review-article-reject {
+            background-color: #dc2626;
+            /* 文章审核不通过 */
+        }
+
+        .review-article-complete {
+            background-color: #059669;
+            /* 文章审核已完成 */
+        }
+
+        /* 弹窗样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s linear 0.25s, opacity 0.25s;
+        }
+
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+            transition-delay: 0s;
+        }
+
+        .modal {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-20px);
+            transition: transform 0.25s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .required-mark {
+            color: #e53e3e;
+        }
+
+        /* 批量添加关键词的表单组样式 */
+        .keyword-form-group {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px dashed #cbd5e0;
+            border-radius: 4px;
+        }
+
+        /* 拒绝弹窗的表单组样式 */
+        .reject-form-group {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px dashed #cbd5e0;
+            border-radius: 4px;
+        }
+
+        .add-form-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            color: #3182ce;
+            background-color: #f0f7ff;
+            border: 1px dashed #3182ce;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .add-form-btn:hover {
+            background-color: #e6f0ff;
+        }
+
+        /* 备注列样式 - 展开/折叠功能 */
+        .remark-cell {
+            position: relative;
+            min-height: 20px;
+        }
+
+        .remark-content {
+            max-height: 40px;
+            /* 折叠状态下最大高度（显示2行左右） */
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            /* 平滑展开/折叠过渡 */
+        }
+
+        .remark-content.expanded {
+            max-height: 200px;
+            /* 展开状态下最大高度，可按需调整 */
+        }
+
+        .expand-btn {
+            margin-top: 4px;
+            padding: 2px 6px;
+            background-color: #f0f7ff;
+            color: #3182ce;
+            border: 1px solid #3182ce;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            /* 按钮文字不换行 */
+        }
+
+        .expand-btn:hover {
+            background-color: #e6f0ff;
+            color: #2b6cb0;
+        }
+
+        /* 分页样式 */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 16px;
+            font-size: 12px;
+            color: #2d3748;
+        }
+
+        .page-size-select {
+            padding: 4px 8px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .page-btn {
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e0;
+            background-color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover {
+            background-color: #f8fafc;
+            border-color: #3182ce;
+            color: #3182ce;
+        }
+
+        .page-btn:disabled {
+            cursor: not-allowed;
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
+            color: #a0aec0;
+        }
+
+        .page-info {
+            color: #718096;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .filter-fields {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .pagination {
+                justify-content: center;
+                /* flex-wrap: wrap; */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .filter-fields {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 返回顶部按钮样式 - 固定在右下方 */
+        .back-to-top-btn {
+            position: fixed;
+            /* 固定定位，不随页面滚动移动 */
+            right: 30px;
+            /* 距离右侧30px */
+            bottom: 30px;
+            /* 距离底部30px */
+            width: 40px;
+            /* 按钮宽度 */
+            height: 40px;
+            /* 按钮高度 */
+            border-radius: 50%;
+            /* 圆形按钮 */
+            background-color: #3182ce;
+            /* 主色调，与页面风格统一 */
+            color: white;
+            /* 图标颜色 */
+            border: none;
+            /* 去除边框 */
+            cursor: pointer;
+            /* 鼠标悬浮显示手型 */
+            font-size: 16px;
+            /* 图标大小 */
+            display: flex;
+            /* 居中对齐图标 */
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            /* 阴影效果，提升层次感 */
+            transition: all 0.3s ease;
+            /* 平滑过渡效果 */
+            opacity: 0;
+            /* 初始状态透明（隐藏） */
+            visibility: hidden;
+            /* 初始状态不可见 */
+            z-index: 999;
+            /* 提高层级，确保不被其他元素遮挡 */
+        }
+
+        /* 按钮悬浮效果 */
+        .back-to-top-btn:hover {
+            background-color: #2b6cb0;
+            /* 深色变体，与其他按钮hover风格一致 */
+            transform: translateY(-2px);
+            /* 轻微上移，增强交互反馈 */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            /* 加深阴影 */
+        }
+
+        /* 按钮显示状态（通过JS添加该类名） */
+        .back-to-top-btn.active {
+            opacity: 1;
+            /* 完全不透明 */
+            visibility: visible;
+            /* 可见 */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- SEO 关键词分配平台（运营规划模块） -->
+        <div class="module">
+            <div class="module-content">
+                <!-- 筛选条件区 -->
+                <div class="filter-area">
+                    <div class="filter-fields">
+                        <div class="filter-item">
+                            <label>关键词</label>
+                            <input type="text" id="filter-keyword" placeholder="输入关键词">
+                        </div>
+                        <div class="filter-item">
+                            <label>创建人</label>
+                            <select class="filter-person" id="filter-creator">
+                                <option value="">请选择</option>
+                                <option value="李四">李四</option>
+                                <option value="王五">王五</option>
+                                <option value="赵六">赵六</option>
+                                <option value="孙七">孙七</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>负责人</label>
+                            <!-- <select class="filter-person" id="filter-person">
+                                <option value="">请选择</option>
+                                <option value="李四">李四</option>
+                                <option value="王五">王五</option>
+                                <option value="赵六">赵六</option>
+                                <option value="孙七">孙七</option>
+                            </select> -->
+                            <div class="leader-drop">
+                                
+                            </div>
+                        </div>
+                        <div class="filter-item">
+                            <label>编写类型</label>
+                            <select id="filter-rewrite-type">
+                                <option value="">请选择</option>
+                                <option value="原创">原创</option>
+                                <option value="改写">改写</option>
+                            </select>
+                        </div>
+                        <!-- 新增：创建类型筛选下拉框 -->
+                        <div class="filter-item">
+                            <label>创建类型</label>
+                            <select id="filter-create-type">
+                                <option value="">请选择</option>
+                                <option value="监控导入">监控导入</option>
+                                <option value="手动添加">手动添加</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>状态</label>
+                            <select id="filter-status">
+                                <option value="">请选择</option>
+                                <option value="待分配">待分配</option>
+                                <option value="待批准">待批准</option>
+                                <option value="待改写">待改写</option>
+                                <option value="待审阅">待审阅</option>
+                                <option value="需修改">需修改</option>
+                                <option value="待发布">待发布</option>
+                                <option value="已完成">已完成</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>审阅状态</label>
+                            <select id="filter-review-status">
+                                <option value="">请选择</option>
+                                <option value="关键词审核未开始">关键词审核未开始</option>
+                                <option value="关键词审核不通过">关键词审核不通过</option>
+                                <option value="关键词审核已完成">关键词审核已完成</option>
+                                <option value="文章审核未开始">文章审核未开始</option>
+                                <option value="文章审核不通过">文章审核不通过</option>
+                                <option value="文章审核已完成">文章审核已完成</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>业务分类</label>
+                            <select id="filter-category">
+                                <option value="">请选择</option>
+                                <option value="品牌词">品牌词</option>
+                                <option value="行业词">行业词</option>
+                                <option value="长尾词">长尾词</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>创建日期</label>
+                            <input type="date" id="filter-create-date">
+                        </div>
+                        <div class="filter-item">
+                            <label>撰写日期</label>
+                            <input type="date" id="filter-write-date">
+                        </div>
+                    </div>
+                    <div style="margin-top: 12px; display: flex; gap: 8px;">
+                        <button class="btn btn-primary" id="filter-search-btn">搜索</button>
+                        <button class="btn btn-secondary" id="filter-reset-btn">重置</button>
+                    </div>
+                </div>
+
+                <!-- 功能按钮区 -->
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="addKeywordBtn">添加关键词</button>
+                    <button class="btn btn-secondary" id="assignKeywordBtn">分配关键词</button>
+                    <button class="btn btn-secondary" id="assignKeywordBtn1">批量导入</button>
+                    <button class="btn btn-secondary batch-actions" style="display: none;">批量通过</button>
+                    <button class="btn btn-danger batch-actions" id="batchRejectBtn"
+                        style="display: none;">批量拒绝</button>
+                    <button class="btn btn-secondary batch-actions" style="display: none;">批量审阅</button>
+                </div>
+
+                <!-- 表格展示区 - 操作列按钮单行显示 + 自动换行 -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll"></th>
+                                <th>关键词</th>
+                                <th>url</th>
+                                <th>文章标题</th>
+                                <th>编写类型</th>
+                                <th>创建类型</th>
+                                <th>创建人</th>
+                                <th>负责人</th>
+                                <th>创建日期</th>
+                                <th>撰写日期</th>
+                                <th>业务分类</th>
+                                <th>状态</th>
+                                <th>审阅状态</th>
+                                <th>备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- 动态生成110条数据 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 分页组件 -->
+                <div class="pagination">
+                    <span>每页显示：</span>
+                    <select class="page-size-select" id="pageSizeSelect">
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <button class="page-btn" id="prevPageBtn" disabled>上一页</button>
+                    <!-- 新增页码输入/选择功能，优化分页体验 -->
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <span>页码：</span>
+                        <input type="number" id="pageNumInput" min="1" value="1" style="width: 50px; padding: 4px; font-size: 12px; border: 1px solid #cbd5e0; border-radius: 4px;">
+                    </div>
+                    <button class="page-btn" id="nextPageBtn">下一页</button>
+                    <span class="page-info" id="pageInfo">第 1 页 / 共 6 页（总 110 条）</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 添加关键词弹窗（支持批量添加） -->
+        <div class="modal-overlay" id="addKeywordModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">添加关键词</h3>
+                    <button class="modal-close" data-modal="addKeywordModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="keywordFormContainer">
+                        <div class="keyword-form-group">
+                            <div class="filter-fields">
+                                <div class="filter-item">
+                                    <label>关键词 <span class="required-mark">*</span></label>
+                                    <input type="text" class="batch-keyword" placeholder="请输入关键词" required>
+                                </div>
+                                <div class="filter-item">
+                                    <label>url <span class="required-mark">*</span></label>
+                                    <input type="url" class="batch-url" placeholder="请输入url" required>
+                                </div>
+                                <div class="filter-item">
+                                    <label>文章标题</label>
+                                    <input type="text" class="batch-article-title" placeholder="请输入文章标题（可选，为空则显示“-”）">
+                                </div>
+                                <div class="filter-item">
+                                    <label>填写类型 <span class="required-mark">*</span></label>
+                                    <select class="batch-type" required>
+                                        <option value="">请选择</option>
+                                        <option value="原创">原创</option>
+                                        <option value="改写">改写</option>
+                                    </select>
+                                </div>
+                                <div class="filter-item">
+                                    <label>负责人</label>
+                                    <select class="batch-person">
+                                        <option value="">请选择</option>
+                                        <option value="李四">李四</option>
+                                        <option value="王五">王五</option>
+                                        <option value="赵六">赵六</option>
+                                        <option value="孙七">孙七</option>
+                                    </select>
+                                </div>
+                                <div class="filter-item" style="grid-column: span 2;">
+                                    <label>业务分类</label>
+                                    <select class="batch-category">
+                                        <option value="">请选择</option>
+                                        <option value="品牌词">品牌词</option>
+                                        <option value="行业词">行业词</option>
+                                        <option value="长尾词">长尾词</option>
+                                    </select>
+                                </div>
+                                <div class="filter-item" style="grid-column: span 2;">
+                                    <label>备注</label>
+                                    <textarea class="batch-remark" rows="2" placeholder="请输入备注信息"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="add-form-btn" id="addFormBtn">
+                        <i class="fa-solid fa-plus"></i> 新增关键词表单
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary modal-close" data-modal="addKeywordModal">取消</button>
+                    <button class="btn btn-primary" id="saveKeywordBtn">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 拒绝弹窗（单个/批量通用） -->
+        <div class="modal-overlay" id="rejectModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="rejectModalTitle">拒绝关键词</h3>
+                    <button class="modal-close" data-modal="rejectModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="rejectFormContainer">
+                        <!-- 动态渲染表单内容 -->
+                    </div>
+                    <input type="hidden" id="reject-row-ids">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary modal-close" data-modal="rejectModal">取消</button>
+                    <button class="btn btn-danger" id="confirmRejectBtn">确认拒绝</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 编辑弹窗 -->
+        <div class="modal-overlay" id="editKeywordModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">全部信息</h3>
+                    <button class="modal-close" data-modal="editKeywordModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="filter-fields">
+                        <div class="filter-item">
+                            <label>关键词 <span class="required-mark">*</span></label>
+                            <input type="text" id="edit-keyword" required>
+                        </div>
+                        <div class="filter-item">
+                            <label>url <span class="required-mark">*</span></label>
+                            <input type="url" id="edit-url" required>
+                        </div>
+                        <div class="filter-item">
+                            <label>文章标题</label>
+                            <input type="text" id="edit-article-title" placeholder="请输入文章标题（为空则显示“-”）">
+                        </div>
+                        <div class="filter-item">
+                            <label>负责人</label>
+                            <select id="edit-person">
+                                <option value="">请选择</option>
+                                <option value="李四">李四</option>
+                                <option value="王五">王五</option>
+                                <option value="赵六">赵六</option>
+                                <option value="孙七">孙七</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>业务分类</label>
+                            <select id="edit-category">
+                                <option value="">请选择</option>
+                                <option value="品牌词">品牌词</option>
+                                <option value="行业词">行业词</option>
+                                <option value="长尾词">长尾词</option>
+                            </select>
+                        </div>
+                        <div class="filter-item" style="grid-column: span 2;">
+                            <label>关键词评论 <span class="required-mark">*</span></label>
+                            <textarea id="edit-keyword-comment" rows="3" placeholder="请输入关键词评论..."></textarea>
+                        </div>
+                        <div class="filter-item" style="grid-column: span 2;">
+                            <label>文章评论 <span class="required-mark">*</span></label>
+                            <textarea id="edit-article-comment" rows="3" placeholder="请输入文章评论..."></textarea>
+                        </div>
+                    </div>
+                    <input type="hidden" id="edit-row-id">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary modal-close" data-modal="editKeywordModal">取消</button>
+                    <button class="btn btn-primary" id="saveEditBtn">保存修改</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 分配关键词弹窗 -->
+        <div class="modal-overlay" id="assignKeywordModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">分配关键词</h3>
+                    <button class="modal-close" data-modal="assignKeywordModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="filter-fields">
+                        <div class="filter-item">
+                            <label>关键词 <span class="required-mark">*</span></label>
+                            <input type="text" id="assignedKeywords" readonly placeholder="已勾选的关键词将显示在此处">
+                        </div>
+                        <div class="filter-item">
+                            <label>负责人 <span class="required-mark">*</span></label>
+                            <select id="assignPerson" required>
+                                <option value="">请选择</option>
+                                <option value="李四">李四</option>
+                                <option value="王五">王五</option>
+                                <option value="赵六">赵六</option>
+                                <option value="孙七">孙七</option>
+                            </select>
+                        </div>
+                        <div class="filter-item" style="grid-column: span 2;">
+                            <label>备注</label>
+                            <textarea id="assignRemarks" rows="3" placeholder="请输入备注信息"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary modal-close" data-modal="assignKeywordModal">取消</button>
+                    <button class="btn btn-primary" id="confirmAssignBtn">确认分配</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 返回顶部按钮 -->
+        <button id="backToTopBtn" class="back-to-top-btn">
+            <i class="fa-solid fa-arrow-up"></i>
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 公共弹窗控制方法
+            function openModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.add('active');
+                }
+            }
+
+            function closeModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.remove('active');
+                }
+            }
+
+            // 关闭弹窗事件（通用）
+            document.querySelectorAll('.modal-close').forEach(button => {
+                button.addEventListener('click', function () {
+                    const modalId = this.getAttribute('data-modal');
+                    closeModal(modalId);
+                });
+            });
+
+            // 点击弹窗外部关闭（通用）
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', function (e) {
+                    if (e.target === this) {
+                        this.classList.remove('active');
+                    }
+                });
+            });
+
+            // ========== 1. 生成固定值110条样例数据（无随机，每次加载一致） ==========
+            const totalDataCount = 110;
+            const statusList = [
+                { className: 'status-allocate', text: '待分配' },
+                { className: 'status-approve', text: '待批准' },
+                { className: 'status-rewrite', text: '待改写' },
+                { className: 'status-review', text: '待审阅' },
+                { className: 'status-modify', text: '需修改' },
+                { className: 'status-publish', text: '待发布' },
+                { className: 'status-completed', text: '已完成' }
+            ];
+            const reviewStatusList = [
+                { className: 'review-keyword-not-start', text: '关键词审核未开始' },
+                { className: 'review-keyword-reject', text: '关键词审核不通过' },
+                { className: 'review-keyword-complete', text: '关键词审核已完成' },
+                { className: 'review-article-not-start', text: '文章审核未开始' },
+                { className: 'review-article-reject', text: '文章审核不通过' },
+                { className: 'review-article-complete', text: '文章审核已完成' }
+            ];
+            const creatorList = ['李四', '王五', '赵六', '孙七'];
+            const personList = ['', '李四', '王五', '赵六', '孙七'];
+            const rewriteTypeList = ['原创', '改写'];
+            const createTypeList = ['手动添加', '监控导入'];
+            const categoryList = ['品牌词', '行业词', '长尾词'];
+            const dateList = ['2025-12-01', '2025-12-02', '2025-12-03', '2025-12-04', '2025-12-05', '2025-12-06', '2025-12-07', '2025-12-08', '2025-12-09', '2025-12-10'];
+            const remarkContent = '这是一条测试备注信息，用于填充表格数据，覆盖所有筛选条件的样例数据展示。';
+
+            // 生成固定样例数据（通过取模运算替代随机数，保证每次加载数据一致）
+            function generateFixedSampleData() {
+                const dataList = [];
+                for (let i = 1; i <= totalDataCount; i++) {
+                    // 取模运算替代Math.random()，保证数据固定
+                    const statusIndex = (i - 1) % statusList.length;
+                    const reviewStatusIndex = (i - 1) % reviewStatusList.length;
+                    const creatorIndex = (i - 1) % creatorList.length;
+                    const personIndex = (i - 1) % personList.length;
+                    const rewriteTypeIndex = (i - 1) % rewriteTypeList.length;
+                    const createTypeIndex = (i - 1) % createTypeList.length;
+                    const categoryIndex = (i - 1) % categoryList.length;
+                    const createDateIndex = (i - 1) % dateList.length;
+                    const writeDateIndex = (i - 1) % dateList.length;
+                    // 固定判断条件，保证文章标题显示一致
+                    const hasArticleTitle = (i % 2) === 0; 
+
+                    const fixedStatus = statusList[statusIndex];
+                    const fixedReviewStatus = reviewStatusList[reviewStatusIndex];
+                    const fixedCreator = creatorList[creatorIndex];
+                    const fixedPerson = personList[personIndex];
+                    const fixedRewriteType = rewriteTypeList[rewriteTypeIndex];
+                    const fixedCreateType = createTypeList[createTypeIndex];
+                    const fixedCategory = categoryList[categoryIndex];
+                    const fixedCreateDate = dateList[createDateIndex];
+                    const fixedWriteDate = (i % 3) === 0 ? '-' : dateList[writeDateIndex];
+                    const articleTitle = hasArticleTitle ? `SEO文章标题${i} - ${fixedRewriteType}创作` : '-';
+
+                    dataList.push({
+                        id: i,
+                        keyword: `SEO关键词${i}`,
+                        url: `https://example.com/seo/${i}`,
+                        articleTitle: articleTitle,
+                        rewriteType: fixedRewriteType,
+                        createType: fixedCreateType,
+                        creator: fixedCreator,
+                        person: fixedPerson || '-',
+                        createDate: fixedCreateDate,
+                        writeDate: fixedWriteDate,
+                        category: fixedCategory,
+                        status: fixedStatus,
+                        reviewStatus: fixedReviewStatus,
+                        remark: remarkContent
+                    });
+                }
+                return dataList;
+            }
+
+            // 原始固定数据
+            const originalFixedData = generateFixedSampleData();
+            // 筛选后的数据（初始等于原始数据）
+            let filteredData = [...originalFixedData];
+            const tableBody = document.getElementById('tableBody');
+
+            // ========== 2. 分页功能实现（修复分页自动刷新，支持筛选后分页） ==========
+            let currentPage = 1;
+            let pageSize = 20; // 默认每页20条
+
+            // 渲染表格数据（基于筛选后的数据）
+            function renderTableData(data, page, size) {
+                tableBody.innerHTML = '';
+                const startIndex = (page - 1) * size;
+                const endIndex = Math.min(startIndex + size, data.length);
+                const currentPageData = data.slice(startIndex, endIndex);
+
+                currentPageData.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.dataset.id = item.id;
+                    tr.innerHTML = `
+                        <td><input type="checkbox" class="row-select"></td>
+                        <td class="td-keyword">${item.keyword}</td>
+                        <td class="td-url">${item.url}</td>
+                        <td class="td-article-title">${item.articleTitle}</td>
+                        <td class="td-rewrite-type">${item.rewriteType}</td>
+                        <td class="td-create-type">${item.createType}</td>
+                        <td class="td-creator">${item.creator}</td>
+                        <td class="td-person">${item.person}</td>
+                        <td class="td-create-time">${item.createDate}</td>
+                        <td class="td-write-time">${item.writeDate}</td>
+                        <td class="td-category">${item.category}</td>
+                        <td><span class="status-tag ${item.status.className}">${item.status.text}</span></td>
+                        <td><span class="status-tag ${item.reviewStatus.className}">${item.reviewStatus.text}</span></td>
+                        <td class="remark-cell">
+                            <div class="remark-content" id="remark-${item.id}">
+                                ${item.remark}
+                            </div>
+                            <button class="expand-btn" data-remark-id="${item.id}">展开</button>
+                        </td>
+                        <td class="action-buttons">
+                            <button class="btn btn-secondary">通过</button>
+                            <button class="btn btn-danger reject-btn" data-row-id="${item.id}">拒绝</button>
+                            <button class="btn btn-secondary">审阅文章</button>
+                            <button class="btn btn-secondary edit-btn" data-row-id="${item.id}"><i class="fa-solid fa-edit"></i></button>
+                            <button class="btn "><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+                // 重新绑定展开/折叠事件
+                bindRemarkExpandEvent();
+                // 重新绑定编辑按钮事件
+                bindEditBtnEvent();
+                // 重新绑定拒绝按钮事件
+                bindRejectBtnEvent();
+                // 重新绑定行选择框事件
+                bindRowSelectEvent();
+            }
+
+            // 更新分页信息（基于筛选后的数据）
+            function updatePaginationInfo(data, page, size) {
+                const totalPages = Math.ceil(data.length / size);
+                document.getElementById('pageInfo').textContent = `第 ${page} 页 / 共 ${totalPages} 页（总 ${data.length} 条）`;
+                // 更新页码输入框的值和最大限制
+                const pageNumInput = document.getElementById('pageNumInput');
+                pageNumInput.value = page;
+                pageNumInput.max = totalPages || 1;
+
+                // 禁用/启用上一页、下一页按钮
+                document.getElementById('prevPageBtn').disabled = page === 1;
+                document.getElementById('nextPageBtn').disabled = page === totalPages;
+            }
+
+            // 页码切换事件（上一页/下一页，基于筛选后的数据）
+            document.getElementById('prevPageBtn').addEventListener('click', function () {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderTableData(filteredData, currentPage, pageSize);
+                    updatePaginationInfo(filteredData, currentPage, pageSize);
+                }
+            });
+
+            document.getElementById('nextPageBtn').addEventListener('click', function () {
+                const totalPages = Math.ceil(filteredData.length / pageSize);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderTableData(filteredData, currentPage, pageSize);
+                    updatePaginationInfo(filteredData, currentPage, pageSize);
+                }
+            });
+
+            // 每页显示条数切换事件（切换后自动刷新分页）
+            document.getElementById('pageSizeSelect').addEventListener('change', function () {
+                pageSize = parseInt(this.value);
+                currentPage = 1; // 重置为第一页
+                renderTableData(filteredData, currentPage, pageSize);
+                updatePaginationInfo(filteredData, currentPage, pageSize);
+            });
+
+            // 页码输入框事件（输入页码后自动刷新分页）
+            document.getElementById('pageNumInput').addEventListener('change', function () {
+                let targetPage = parseInt(this.value);
+                const totalPages = Math.ceil(filteredData.length / pageSize);
+                // 边界值处理
+                if (isNaN(targetPage)) targetPage = 1;
+                if (targetPage < 1) targetPage = 1;
+                if (targetPage > totalPages) targetPage = totalPages;
+
+                currentPage = targetPage;
+                renderTableData(filteredData, currentPage, pageSize);
+                updatePaginationInfo(filteredData, currentPage, pageSize);
+            });
+
+            // ========== 3. 筛选功能实现（多条件精准筛选，新增创建类型筛选） ==========
+            // 获取所有筛选条件的值（新增创建类型）
+            function getFilterConditions() {
+                return {
+                    keyword: document.getElementById('filter-keyword').value.trim().toLowerCase(),
+                    creator: document.getElementById('filter-creator').value,
+                    person: document.getElementById('filter-person').value,
+                    rewriteType: document.getElementById('filter-rewrite-type').value,
+                    createType: document.getElementById('filter-create-type').value, // 新增：创建类型筛选值
+                    status: document.getElementById('filter-status').value,
+                    reviewStatus: document.getElementById('filter-review-status').value,
+                    category: document.getElementById('filter-category').value,
+                    createDate: document.getElementById('filter-create-date').value,
+                    writeDate: document.getElementById('filter-write-date').value
+                };
+            }
+
+            // 执行筛选逻辑（新增创建类型筛选判断）
+            function executeFilter() {
+                const conditions = getFilterConditions();
+                // 基于原始固定数据进行筛选
+                filteredData = originalFixedData.filter(item => {
+                    // 关键词模糊匹配
+                    if (conditions.keyword && !item.keyword.toLowerCase().includes(conditions.keyword)) {
+                        return false;
+                    }
+                    // 创建人精准匹配
+                    if (conditions.creator && item.creator !== conditions.creator) {
+                        return false;
+                    }
+                    // 负责人精准匹配
+                    if (conditions.person && item.person !== conditions.person) {
+                        return false;
+                    }
+                    // 编写类型精准匹配
+                    if (conditions.rewriteType && item.rewriteType !== conditions.rewriteType) {
+                        return false;
+                    }
+                    // 新增：创建类型精准匹配
+                    if (conditions.createType && item.createType !== conditions.createType) {
+                        return false;
+                    }
+                    // 状态精准匹配
+                    if (conditions.status && item.status.text !== conditions.status) {
+                        return false;
+                    }
+                    // 审阅状态精准匹配
+                    if (conditions.reviewStatus && item.reviewStatus.text !== conditions.reviewStatus) {
+                        return false;
+                    }
+                    // 分类精准匹配
+                    if (conditions.category && item.category !== conditions.category) {
+                        return false;
+                    }
+                    // 创建日期精准匹配
+                    if (conditions.createDate && item.createDate !== conditions.createDate) {
+                        return false;
+                    }
+                    // 撰写日期精准匹配
+                    if (conditions.writeDate && item.writeDate !== conditions.writeDate) {
+                        return false;
+                    }
+                    return true;
+                });
+
+                // 筛选后重置分页为第一页，并刷新表格和分页信息
+                currentPage = 1;
+                renderTableData(filteredData, currentPage, pageSize);
+                updatePaginationInfo(filteredData, currentPage, pageSize);
+            }
+
+            // 搜索按钮点击事件（执行筛选）
+            document.getElementById('filter-search-btn').addEventListener('click', executeFilter);
+
+            // 重置按钮点击事件（清空所有筛选条件并重置数据，新增清空创建类型筛选）
+            document.getElementById('filter-reset-btn').addEventListener('click', function () {
+                // 清空所有筛选输入框/下拉框（新增filter-create-type）
+                document.querySelectorAll('#filter-keyword, #filter-creator, #filter-person, #filter-rewrite-type, #filter-create-type, #filter-status, #filter-review-status, #filter-category, #filter-create-date, #filter-write-date').forEach(el => {
+                    el.value = '';
+                });
+                // 重置筛选后数据为原始数据
+                filteredData = [...originalFixedData];
+                // 重置分页为第一页，刷新表格和分页信息
+                currentPage = 1;
+                renderTableData(filteredData, currentPage, pageSize);
+                updatePaginationInfo(filteredData, currentPage, pageSize);
+            });
+
+            // ========== 4. 分配关键词弹窗 - 显示勾选的关键词 ==========
+            document.getElementById('assignKeywordBtn').addEventListener('click', function () {
+                // 获取所有勾选的行
+                const selectedCheckboxes = document.querySelectorAll('.row-select:checked');
+                const selectedKeywords = [];
+
+                selectedCheckboxes.forEach(checkbox => {
+                    const row = checkbox.closest('tr');
+                    const keyword = row.querySelector('.td-keyword').textContent;
+                    selectedKeywords.push(keyword);
+                });
+
+                // 填充勾选的关键词到弹窗
+                const assignedKeywordsInput = document.getElementById('assignedKeywords');
+                assignedKeywordsInput.value = selectedKeywords.join('，') || '未勾选任何关键词';
+
+                openModal('assignKeywordModal');
+            });
+
+            // ========== 5. 绑定各类事件 ==========
+            // 备注展开/折叠事件
+            function bindRemarkExpandEvent() {
+                document.querySelectorAll('.expand-btn').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const remarkId = this.getAttribute('data-remark-id');
+                        const remarkContent = document.getElementById(`remark-${remarkId}`);
+                        remarkContent.classList.toggle('expanded');
+                        this.textContent = remarkContent.classList.contains('expanded') ? '折叠' : '展开';
+                    });
+                });
+            }
+
+            // 编辑按钮事件
+            function bindEditBtnEvent() {
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const rowId = this.getAttribute('data-row-id');
+                        const row = document.querySelector(`tr[data-id="${rowId}"]`);
+                        const keyword = row.querySelector('.td-keyword').textContent;
+                        const url = row.querySelector('.td-url').textContent;
+                        const articleTitle = row.querySelector('.td-article-title').textContent;
+                        const person = row.querySelector('.td-person').textContent === '-' ? '' : row.querySelector('.td-person').textContent;
+                        const category = row.querySelector('.td-category').textContent;
+
+                        document.getElementById('edit-row-id').value = rowId;
+                        document.getElementById('edit-keyword').value = keyword;
+                        document.getElementById('edit-url').value = url;
+                        document.getElementById('edit-article-title').value = articleTitle === '-' ? '' : articleTitle;
+                        document.getElementById('edit-person').value = person;
+                        document.getElementById('edit-category').value = category;
+                        document.getElementById('edit-keyword-comment').value = '';
+                        document.getElementById('edit-article-comment').value = '';
+
+                        openModal('editKeywordModal');
+                    });
+                });
+            }
+
+            // 拒绝按钮事件
+            function bindRejectBtnEvent() {
+                document.querySelectorAll('.reject-btn').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const rowId = this.getAttribute('data-row-id');
+                        const rejectFormContainer = document.getElementById('rejectFormContainer');
+                        rejectFormContainer.innerHTML = '';
+                        document.getElementById('rejectModalTitle').textContent = '拒绝关键词';
+                        document.getElementById('reject-row-ids').value = rowId;
+                        const singleForm = generateSingleRejectForm(rowId);
+                        rejectFormContainer.appendChild(singleForm);
+
+                        openModal('rejectModal');
+                    });
+                });
+            }
+
+            // 行选择框事件
+            function bindRowSelectEvent() {
+                const rowCheckboxes = document.querySelectorAll('.row-select');
+                const batchActionButtons = document.querySelectorAll('.batch-actions');
+
+                rowCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function () {
+                        const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
+                        document.getElementById('selectAll').checked = allChecked;
+                        updateBatchButtonsVisibility();
+                    });
+                });
+            }
+
+            // 全选事件
+            const selectAllCheckbox = document.getElementById('selectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function () {
+                    const rowCheckboxes = document.querySelectorAll('.row-select');
+                    rowCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    updateBatchButtonsVisibility();
+                });
+            }
+
+            // 更新批量按钮显示状态
+            function updateBatchButtonsVisibility() {
+                const anyChecked = Array.from(document.querySelectorAll('.row-select')).some(cb => cb.checked);
+                document.querySelectorAll('.batch-actions').forEach(button => {
+                    button.style.display = anyChecked ? 'inline-block' : 'none';
+                });
+            }
+
+            // 生成单个拒绝表单
+            function generateSingleRejectForm(rowId) {
+                const row = document.querySelector(`tr[data-id="${rowId}"]`);
+                const keyword = row.querySelector('.td-keyword').textContent;
+                const articleTitle = row.querySelector('.td-article-title').textContent;
+                const isArticleTitleExist = articleTitle !== '-' && articleTitle.trim() !== '';
+
+                const formGroup = document.createElement('div');
+                formGroup.className = 'reject-form-group';
+                formGroup.dataset.rowId = rowId;
+
+                let formContent = '';
+                if (isArticleTitleExist) {
+                    formContent = `
+                        <div class="filter-fields">
+                            <div class="filter-item" style="grid-column: span 2;">
+                                <label>文章标题 <span class="required-mark">*</span></label>
+                                <input type="text" class="reject-title" value="${articleTitle}" readonly>
+                            </div>
+                            <div class="filter-item" style="grid-column: span 2;">
+                                <label>文章评论（可选）</label>
+                                <textarea class="reject-comment" rows="3" placeholder="请输入拒绝理由..."></textarea>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    formContent = `
+                        <div class="filter-fields">
+                            <div class="filter-item" style="grid-column: span 2;">
+                                <label>关键词 <span class="required-mark">*</span></label>
+                                <input type="text" class="reject-keyword" value="${keyword}" readonly>
+                            </div>
+                            <div class="filter-item" style="grid-column: span 2;">
+                                <label>关键词评论（可选）</label>
+                                <textarea class="reject-comment" rows="3" placeholder="请输入拒绝理由..."></textarea>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                formGroup.innerHTML = formContent;
+                return formGroup;
+            }
+
+            // ========== 6. 编辑保存事件 ==========
+            document.getElementById('saveEditBtn').addEventListener('click', function () {
+                const rowId = document.getElementById('edit-row-id').value;
+                const keyword = document.getElementById('edit-keyword').value;
+                const url = document.getElementById('edit-url').value;
+                const articleTitleInput = document.getElementById('edit-article-title').value;
+                const articleTitle = articleTitleInput.trim() === '' ? '-' : articleTitleInput;
+                const keywordComment = document.getElementById('edit-keyword-comment').value;
+                const articleComment = document.getElementById('edit-article-comment').value;
+
+                if (!keyword || !url || !keywordComment || !articleComment) {
+                    alert('关键词、URL、关键词评论、文章评论为必填项！');
+                    return;
+                }
+
+                const person = document.getElementById('edit-person').value;
+                const category = document.getElementById('edit-category').value;
+
+                const row = document.querySelector(`tr[data-id="${rowId}"]`);
+                row.querySelector('.td-keyword').textContent = keyword;
+                row.querySelector('.td-url').textContent = url;
+                row.querySelector('.td-article-title').textContent = articleTitle;
+                row.querySelector('.td-person').textContent = person || '-';
+                row.querySelector('.td-category').textContent = category;
+
+                // 同步更新原始数据和筛选后数据
+                const dataIndex = originalFixedData.findIndex(item => item.id == rowId);
+                if (dataIndex !== -1) {
+                    originalFixedData[dataIndex].keyword = keyword;
+                    originalFixedData[dataIndex].url = url;
+                    originalFixedData[dataIndex].articleTitle = articleTitle;
+                    originalFixedData[dataIndex].person = person || '-';
+                    originalFixedData[dataIndex].category = category;
+                }
+                const filteredIndex = filteredData.findIndex(item => item.id == rowId);
+                if (filteredIndex !== -1) {
+                    filteredData[filteredIndex].keyword = keyword;
+                    filteredData[filteredIndex].url = url;
+                    filteredData[filteredIndex].articleTitle = articleTitle;
+                    filteredData[filteredIndex].person = person || '-';
+                    filteredData[filteredIndex].category = category;
+                }
+
+                closeModal('editKeywordModal');
+                alert('关键词编辑成功！');
+            });
+
+            // ========== 7. 批量拒绝事件 ==========
+            document.getElementById('batchRejectBtn').addEventListener('click', function () {
+                const selectedCheckboxes = document.querySelectorAll('.row-select:checked');
+                const selectedRowIds = [];
+                const rejectFormContainer = document.getElementById('rejectFormContainer');
+                rejectFormContainer.innerHTML = '';
+
+                if (selectedCheckboxes.length === 0) {
+                    alert('请先选择需要批量拒绝的关键词！');
+                    return;
+                }
+
+                document.getElementById('rejectModalTitle').textContent = `批量拒绝（共${selectedCheckboxes.length}条数据）`;
+                selectedCheckboxes.forEach(checkbox => {
+                    const row = checkbox.closest('tr');
+                    const rowId = row.dataset.id;
+                    selectedRowIds.push(rowId);
+                    const batchForm = generateSingleRejectForm(rowId);
+                    rejectFormContainer.appendChild(batchForm);
+                });
+
+                document.getElementById('reject-row-ids').value = selectedRowIds.join(',');
+                openModal('rejectModal');
+            });
+
+            // ========== 8. 确认拒绝事件 ==========
+            document.getElementById('confirmRejectBtn').addEventListener('click', function () {
+                const rowIdsStr = document.getElementById('reject-row-ids').value;
+                const rowIds = rowIdsStr.split(',');
+                const rejectFormGroups = document.querySelectorAll('.reject-form-group');
+                const rejectDataList = [];
+
+                rejectFormGroups.forEach((formGroup, index) => {
+                    const rowId = formGroup.dataset.rowId;
+                    const isArticleForm = formGroup.querySelector('.reject-title') !== null;
+                    let titleOrKeyword = '';
+                    let comment = '';
+
+                    if (isArticleForm) {
+                        titleOrKeyword = formGroup.querySelector('.reject-title').value;
+                        comment = formGroup.querySelector('.reject-comment').value;
+                        rejectDataList.push({
+                            rowId: rowId,
+                            type: 'article',
+                            articleTitle: titleOrKeyword,
+                            articleComment: comment
+                        });
+                    } else {
+                        titleOrKeyword = formGroup.querySelector('.reject-keyword').value;
+                        comment = formGroup.querySelector('.reject-comment').value;
+                        rejectDataList.push({
+                            rowId: rowId,
+                            type: 'keyword',
+                            keyword: titleOrKeyword,
+                            keywordComment: comment
+                        });
+                    }
+                });
+
+                closeModal('rejectModal');
+
+                if (rowIds.length === 1) {
+                    const data = rejectDataList[0];
+                    const content = data.type === 'article' ? `文章【${data.articleTitle}】` : `关键词【${data.keyword}】`;
+                    alert(`已拒绝${content}，拒绝理由：${data.articleComment || data.keywordComment || '无'}`);
+                } else {
+                    alert(`已批量拒绝${rowIds.length}条数据！`);
+                }
+            });
+
+            // ========== 9. 添加关键词事件 ==========
+            document.getElementById('addKeywordBtn').addEventListener('click', function () {
+                openModal('addKeywordModal');
+            });
+
+            document.getElementById('addFormBtn').addEventListener('click', function () {
+                const container = document.getElementById('keywordFormContainer');
+                const newForm = document.querySelector('.keyword-form-group').cloneNode(true);
+                newForm.querySelectorAll('input, select, textarea').forEach(input => {
+                    input.value = '';
+                });
+                container.appendChild(newForm);
+            });
+
+            document.getElementById('saveKeywordBtn').addEventListener('click', function () {
+                const formGroups = document.querySelectorAll('.keyword-form-group');
+                const keywordList = [];
+                let isValid = true;
+
+                formGroups.forEach((group, index) => {
+                    const keyword = group.querySelector('.batch-keyword').value;
+                    const url = group.querySelector('.batch-url').value;
+                    const articleTitleInput = group.querySelector('.batch-article-title').value;
+                    const articleTitle = articleTitleInput.trim() === '' ? '-' : articleTitleInput;
+                    const type = group.querySelector('.batch-type').value;
+
+                    if (!keyword || !url || !type) {
+                        alert(`第${index + 1}个关键词表单的关键词、URL、填写类型为必填项！`);
+                        isValid = false;
+                        return;
+                    }
+
+                    keywordList.push({
+                        keyword: keyword,
+                        url: url,
+                        articleTitle: articleTitle,
+                        type: type,
+                        person: group.querySelector('.batch-person').value,
+                        category: group.querySelector('.batch-category').value,
+                        remark: group.querySelector('.batch-remark').value
+                    });
+                });
+
+                if (!isValid) return;
+
+                closeModal('addKeywordModal');
+                const container = document.getElementById('keywordFormContainer');
+                while (container.children.length > 1) {
+                    container.removeChild(container.lastChild);
+                }
+                container.querySelector('.batch-keyword').value = '';
+                container.querySelector('.batch-url').value = '';
+                container.querySelector('.batch-article-title').value = '';
+                container.querySelector('.batch-type').value = '';
+                container.querySelector('.batch-person').value = '';
+                container.querySelector('.batch-category').value = '';
+                container.querySelector('.batch-remark').value = '';
+
+                // 同步添加到原始数据和筛选后数据
+                keywordList.forEach(newKeyword => {
+                    const newId = originalFixedData.length + 1;
+                    const newDataItem = {
+                        id: newId,
+                        keyword: newKeyword.keyword,
+                        url: newKeyword.url,
+                        articleTitle: newKeyword.articleTitle,
+                        rewriteType: newKeyword.type,
+                        createType: '手动添加',
+                        creator: '当前用户',
+                        person: newKeyword.person || '-',
+                        createDate: new Date().toISOString().split('T')[0],
+                        writeDate: '-',
+                        category: newKeyword.category || '品牌词',
+                        status: statusList[0],
+                        reviewStatus: reviewStatusList[0],
+                        remark: newKeyword.remark || remarkContent
+                    };
+                    originalFixedData.push(newDataItem);
+                    filteredData.push(newDataItem);
+                });
+
+                // 添加后刷新表格和分页
+                renderTableData(filteredData, currentPage, pageSize);
+                updatePaginationInfo(filteredData, currentPage, pageSize);
+
+                alert(`已成功添加${keywordList.length}个关键词！`);
+            });
+
+            // ========== 10. 确认分配事件 ==========
+            document.getElementById('confirmAssignBtn').addEventListener('click', function () {
+                const assignPerson = document.getElementById('assignPerson').value;
+                const assignRemarks = document.getElementById('assignRemarks').value;
+                const assignedKeywords = document.getElementById('assignedKeywords').value;
+
+                if (!assignPerson) {
+                    alert('请选择负责人！');
+                    return;
+                }
+
+                const selectedRows = document.querySelectorAll('.row-select:checked');
+                const selectedCount = selectedRows.length;
+
+                // 同步更新负责人信息
+                selectedRows.forEach(row => {
+                    const rowId = row.dataset.id;
+                    row.querySelector('.td-person').textContent = assignPerson;
+                    // 更新原始数据
+                    const dataIndex = originalFixedData.findIndex(item => item.id == rowId);
+                    if (dataIndex !== -1) {
+                        originalFixedData[dataIndex].person = assignPerson;
+                    }
+                    // 更新筛选后数据
+                    const filteredIndex = filteredData.findIndex(item => item.id == rowId);
+                    if (filteredIndex !== -1) {
+                        filteredData[filteredIndex].person = assignPerson;
+                    }
+                });
+
+                closeModal('assignKeywordModal');
+                document.getElementById('assignPerson').value = '';
+                document.getElementById('assignRemarks').value = '';
+                document.getElementById('assignedKeywords').value = '';
+
+                alert(selectedCount > 0 ?
+                    `已为${selectedCount}个关键词分配负责人【${assignPerson}】！` :
+                    `已设置默认负责人【${assignPerson}】！`);
+            });
+
+            // ========== 初始化 ==========
+            renderTableData(filteredData, currentPage, pageSize);
+            updatePaginationInfo(filteredData, currentPage, pageSize);
+        });
+
+        // ========== 返回顶部按钮功能 ==========
+        const backToTopBtn = document.getElementById('backToTopBtn');
+
+        // 1. 滚动事件监听：控制按钮显示/隐藏
+        window.addEventListener('scroll', function () {
+            // 当页面滚动距离超过300px时显示按钮，否则隐藏
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('active');
+            } else {
+                backToTopBtn.classList.remove('active');
+            }
+        });
+
+        // 2. 点击按钮：平滑滚动返回顶部
+        backToTopBtn.addEventListener('click', function () {
+            window.scrollTo({
+                top: 0, // 滚动到页面顶部
+                behavior: 'smooth' // 平滑滚动效果，而非瞬间跳转
+            });
+        });
+    </script>
+</body>
+
+</html>
